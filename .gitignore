@@ -1,0 +1,7 @@
+/bin
+/deb_packaging
+*.deb
+/src/.classpath
+/src/.project
+/src/.settings
+/.settings

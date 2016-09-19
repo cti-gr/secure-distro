@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="219.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gr.cti.securedistro.CopyrightController">
+   <children>
+      <Button fx:id="btnOK" layoutX="250.0" layoutY="170.0" mnemonicParsing="false" onAction="#closeWindow" prefHeight="35.0" prefWidth="101.0" text="OK" />
+      <ImageView fitHeight="75.0" fitWidth="398.0" layoutX="110.0" layoutY="94.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../media/espa-logo.jpg" />
+         </image></ImageView>
+      <Label fx:id="lblCopyright" layoutX="-3.0" layoutY="-1.0" prefHeight="95.0" prefWidth="606.0" text="Label">
+         <padding>
+            <Insets bottom="5.0" left="10.0" right="5.0" top="5.0" />
+         </padding>
+      </Label>
+   </children>
+</Pane>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+
+<project basedir="." default="Main" name="secure-distro">
+	
+	<property name="src.dir" location="src" />
+	<property name="build.dir" location="bin" />
+	<property name="scripts.dir" location="src/bash" />
+	<property name="resources.dir" location="src/resources" />
+	<property name="dist.dir" location="deb_packaging/opt/secure-distro/bin/" />
+	<property name="lib.dir" location="lib" />
+
+	<path id="classpath">
+		<pathelement location="lib/controlsfx-8.40.10-snapshot.jar" />
+		<pathelement location="${lib.dir}" />
+	</path>
+
+
+	<!-- Deletes the existing build directory-->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<!-- Creates the  build  directory-->
+	<target name="makedir">
+		<mkdir dir="${build.dir}" />
+	</target>
+
+	<!-- Creates the dist  directory-->
+	<target name="makedist">
+		<mkdir dir="${dist.dir}" />
+	</target>
+
+	<!-- Compiles the java code and copies resources -->
+	<target name="compile" depends="clean, makedir">
+		<javac srcdir="${src.dir}" destdir="${build.dir}">
+			<classpath refid="classpath" />
+		 </javac>
+		<copy todir="${build.dir}/resources">
+			<fileset dir="${resources.dir}" />
+		</copy>
+	</target>
+
+	
+	<!--Creates the deployable jar file  -->
+	<target name="jar" depends="clean, makedist, compile">
+		<jar destfile="${dist.dir}\secure-distro.jar" basedir="${build.dir}">
+			<zipgroupfileset dir="${lib.dir}" includes="**/*.jar" />
+			<manifest>
+				<attribute name="Main-Class" value="gr.cti.securedistro.Main" />				
+			</manifest>
+		</jar>
+		<copy todir="${dist.dir}">
+			<fileset dir="${scripts.dir}" />			
+		</copy>
+		<copy file="${resources.dir}/media/sd-wallpaper.png" tofile="${dist.dir}/sd-wallpaper.png" overwrite="true" />
+		<copy file="${resources.dir}/media/sd_logo.png" tofile="${dist.dir}/sd_logo.png" overwrite="true" />
+	</target>
+
+
+	<target name="Main" depends="jar">
+		<description>Main target</description>
+	</target>
+
+</project>

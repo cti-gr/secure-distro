@@ -1,0 +1,40 @@
+--Compiling the Debian Package------------------------------------------------------------------------------------
+1) Go top directory of the project
+3) Increase the version counter in control file (important!!)
+2) sudo dpkg-deb --build ./deb_packaging/; 
+3) sudo mv deb_packaging.deb secure-distro.deb; 
+4) scp secure-distro.deb  pkaramol@150.140.90.160:/var/www/html/secure-distro/debs/binary; // move deb to deb repo server
+5) Do steps 4-to-8 of Server Setup
+
+Various Notes:
+sudo rm -rf secure-distro.deb; sudo dpkg-deb --build ./deb_packaging/;sudo mv deb_packaging.deb secure-distro.deb; scp secure-distro.deb  theodori@150.140.90.160:/var/www/html/secure-distro/debs/binary;
+	sudo dpkg -i SecureDistro.deb 
+
+--Client Setup-----------------------------------------------------------------------------------
+1) sudo add-apt-repository 'deb http://secure-distro.cti.gr/debs binary/'
+2) sudo apt-get update
+3) sudo apg-get install secure-distro
+
+Various Notes:
+	150.140.90.160 (secure-distro.cti.gr)
+	πρεπει να μην δηλώνεται το deb-sources!!!!!!! (/etc/apt/sources.list)
+	apt-get install google-chrome-dianomi-asfaleias
+	apt-get install da-settings
+
+
+-- Server Setup ------------------------------------------------------------------------------------
+1) Install apache2(apt-get install apache2)
+2) Create a directory for the packages under the www root eg. /var/www/html/secure-distro/debs/binary
+3) copy debs to /var/www/html/secure-distro/debs/binary   directory 
+
+Create a Packages.gz file:
+4) cd /var/www/html/secure-distro/debs/
+5) dpkg-scanpackages binary>Packages;
+6) gzip -9c Packages >Packages.gz; 
+7) mv Packages.gz binary; 
+8) chmod 755 ./binary/*;
+
+Various Notes:
+	dpkg-scanpackages binary>Packages;gzip -9c Packages >Packages.gz; mv Packages.gz binary; rm Packages;chmod 755 ./binary/*;ls ./binary;
+	 
+

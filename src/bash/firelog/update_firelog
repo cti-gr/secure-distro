@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# This file is part of the PROTOS project: http://protos.cti.gr
+# Contact e-mail: protosproject@gmail.com
+#
+# Firelog Linux client update script
+# Version: 0.1 Beta
+# Updated: 2013-04-21
+
+
+installDir=/usr/local/share/firelog
+versionFile=$installDir/version.txt
+versionUrl=http://protos.cti.gr/firelog/linux/ubuntu/version.html
+clientUrl=http://protos.cti.gr/firelog/linux/ubuntu
+
+
+# We need root privileges to perform some operations
+if [ $(id -u) -ne 0 ]; then
+    echo "[-] You need to be root to run this script"
+    exit 1
+fi
+
+# Check if version file exists. If not, assume version = 0
+if [ ! -e $versionFile ]; then
+    currentVersion=0
+else
+    currentVersion=$(cat "$versionFile")
+fi
+
+latestVersion=$(wget -q -O - $versionUrl)
+# If the page was not accessed correctly, set latestVersion=0 to avoid crashes
+if [ -z $latestVersion ]; then
+    latestVersion=0
+fi
+
+if [ $(echo "$currentVersion < $latestVersion" | bc) -eq 1 ]; then
+    # Newer version available
+
+    # Download and prepare newer version...
+    wget $clientUrl/firelog -q -O $installDir/firelog
+    chmod 744 $installDir/firelog
+    chown root.root $installDir/firelog
+
+    wget $clientUrl/update_firelog -q -O $installDir/update_firelog
+    chmod 744 $installDir/update_firelog
+    chown root.root $installDir/update_firelog
+
+    # Respawn the new service
+    killall firelog
+
+    # Finally, update version file
+    echo "$latestVersion" > "$versionFile"
+fi

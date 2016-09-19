@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="465.0" prefWidth="629.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gr.cti.securedistro.UsersAdminController">
+   <children>
+      <SplitPane fx:id="splitPaneAdminUsers" dividerPositions="0.19516129032258064" layoutX="86.0" layoutY="20.0" orientation="VERTICAL" prefHeight="504.0" prefWidth="621.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <items>
+          <AnchorPane fx:id="ancPaneUpperUsers" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="598.0">
+               <children>
+                  <Label fx:id="lblUserAdminMain" alignment="CENTER" layoutX="53.0" layoutY="29.0" prefHeight="24.0" prefWidth="477.0" text="ΔΙΑΧΕΙΡΙΣΗ ΧΡΗΣΤΩΝ" textAlignment="CENTER">
+                     <font>
+                        <Font size="19.0" />
+                     </font>
+                  </Label>
+                  <ImageView fitHeight="64.0" fitWidth="73.0" layoutX="555.0" layoutY="-5.0">
+                     <image>
+                        <Image url="@../media/sd_logo.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="418.0" prefWidth="619.0">
+               <children>
+                  <ScrollPane fx:id="srcPaneUsers" layoutX="71.0" layoutY="22.0" prefHeight="154.0" prefWidth="627.0" AnchorPane.bottomAnchor="215.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <padding>
+                        <Insets top="5.0" />
+                     </padding></ScrollPane>
+                  <Button fx:id="btnAddUser" layoutX="150.0" layoutY="204.0" mnemonicParsing="false" onAction="#showAddNonSudoUserPane" prefHeight="58.0" prefWidth="320.0" text="ΠΡΟΣΘΗΚΗ ΝΕΟΥ ΧΡΗΣΤΗ" />
+                  <Button fx:id="btnExitUsers" layoutX="230.0" layoutY="287.0" mnemonicParsing="false" onAction="#btnExitAction" prefHeight="49.0" prefWidth="161.0" text="ΕΞΟΔΟΣ" />
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
+</AnchorPane>

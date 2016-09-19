@@ -1,0 +1,155 @@
+#!/bin/bash
+
+# This file is part of the PROTOS project: http://protos.cti.gr
+# Contact e-mail: protosproject@gmail.com
+#
+# Firelog Linux client 
+# Version: 0.3 Beta
+# Updated: 2013-04-20
+
+
+function fcalc {
+    TEMP=`echo "scale=4; $1" | bc`
+    ROUND=`echo $1 | bc`
+    if [ $ROUND -eq 0 -a ! $TEMP == 0 ]; then
+	echo ${TEMP/./0.}
+    else
+	echo $TEMP
+    fi
+}
+
+#
+# Firelog configuration
+#
+
+DATA_DIR=/usr/local/share/firelog # All data in here
+DB_FILE=$DATA_DIR/firelog.db
+# firelog executable should be in: /usr/local/sbin
+FW_LOGFILE=/var/log/ufw.log # Should be standard among distros
+TMP_FILE=/tmp/firelog.tmp
+TMP_FILE2=/tmp/firelog2.tmp
+
+
+echo '[*] Firelog: PROTOS client service' 
+
+# We need root privileges to perform some operations
+if [ `id -u` -ne 0 ]; then
+    echo '[-] You need to be root to run this script'
+    exit 1
+fi
+
+# Check if the logfile exists so previous data can be used
+if [ ! -e $FW_LOGFILE ]; then
+    echo -n "[*] Make sure that firewall and logging are enabled in this computer before continuing. Do you want to proceed [y/n]? "
+    while read ANSWER
+    do
+	if [ $ANSWER == "y" ]; then
+	    break
+	elif [ $ANSWER == "n" ]; then
+	    echo "[-] Exiting..."
+	    exit 0
+	fi
+	echo -n "Please answer [y/n]: " 
+    done
+    touch $FW_LOGFILE
+fi
+
+# Check if database file exists
+if [ ! -e $DB_FILE ]; then
+    echo "[*] Database file not found in $DATA_DIR, creating a new database."
+    touch $DB_FILE
+    sqlite3 $DB_FILE "CREATE TABLE firewallLog (date TEXT, time TEXT, action TEXT, protocol TEXT,srcip TEXT,dstip TEXT,srcport TEXT, \
+                      dstport TEXT,size TEXT,tcpflags TEXT, tcpsyn TEXT, tcpack TEXT, tcpwin TEXT,icmptype TEXT, icmpcode TEXT,info TEXT, path TEXT);"
+	sqlite3 $DB_FILE "CREATE INDEX datetime_index ON firewallLog(date,time);"
+fi
+
+# For ubuntu[8|9] the firewall is ufw, for everyone else iptables
+# so set the keywords accordingly to search for the firewall logs
+grep 'ubuntu' /proc/version > /dev/null
+if [ $? -eq 0 ]; then
+    FW_KEYWORD='UFW'
+else
+    FW_KEYWORD='Connection attempt'
+fi
+
+
+echo "[*] Running in background mode."
+
+# Example entry:
+# Jun 30 13:07:51 mypchostname kernel: [15702368.296557] [UFW BLOCK] IN=eth1 OUT= MAC=00:22:19:5e:8f:23:00:0c:db:fc:8b:00:08:00 SRC=192.168.1.100 DST=192.168.1.200 LEN=40 TOS=0x00 PREC=0x00 TTL=55 ID=47632 PROTO=TCP SPT=58875 DPT=80 WINDOW=65535 RES=0x00 ACK FIN URGP=0
+
+(while [ 1 ] 
+do
+    sleep 30
+    PAST_TIME=`date -d "30 second ago" +%s`
+    
+    grep "$FW_KEYWORD" "$FW_LOGFILE" | grep "`date '+%b %e'`" > $TMP_FILE
+    LINES=`cat $TMP_FILE | wc -l`    
+    if [ ! -n "${PLINES+x}" ]; then
+	PLINES=$LINES
+	CUT_LINES=$LINES
+    else
+	CUT_LINES=`expr $LINES - $PLINES`
+	PLINES=$LINES
+    fi
+    cat $TMP_FILE | tail -n $CUT_LINES > $TMP_FILE2
+    COUNTER=0
+    while read line 
+    do    
+	LDATE=`echo $line | awk '{print $1, $2 ,$3}'`
+	TIME=`date -d "$LDATE" +%s`
+	if [ $TIME -gt $PAST_TIME ]; then
+	    set -- $line
+	    DATE="$(date '+%Y-%m-%d' -d "$1 $2")"
+	    TIME="$3"
+	    ACTION="BLOCK"
+	    PROTO=`echo $line | grep -o 'PROTO=[A-Za-z]*'`
+	    PROTO=${PROTO#'PROTO='}
+	    SRCIP=`echo $line | grep -o "SRC=[0-9]*.[0-9]*.[0-9]*.[0-9]*"`
+	    SRCIP=${SRCIP#'SRC='}
+	    DSTIP=`echo $line | grep -o "DST=[0-9]*.[0-9]*.[0-9]*.[0-9]*"`
+	    DSTIP=${DSTIP#'DST='}
+	    SRCPT=`echo $line | grep -o 'SPT=[0-9]*'`
+	    SRCPT=${SRCPT#'SPT='}
+	    DSTPT=`echo $line | grep -o 'DPT=[0-9]*'`
+	    DSTPT=${DSTPT#'DPT='}
+	    SIZE=`echo $line | grep -o "LEN=[0-9]*$"`
+	    SIZE=${SIZE#'LEN='}
+	    sqlite3 $DB_FILE "INSERT INTO firewallLog (date, time, action, protocol, srcip, dstip, srcport, dstport, size) \
+		 VALUES ('$DATE', '$TIME', '$ACTION', '$PROTO', '$SRCIP', '$DSTIP', '$SRCPT', '$DSTPT', '$SIZE');"	    
+	    COUNTER=`expr $COUNTER + 1`
+	fi
+    done < $TMP_FILE2
+    rm $TMP_FILE $TMP_FILE2
+    
+    ###############################
+    # Calculate
+    if [ $COUNTER -eq 0 ]; then
+	COUNTER=1
+    fi
+    
+    if [ ! -n "${PREVIOUS_INCIDENTS+x}" ]; then
+	PREVIOUS_INCIDENTS=$COUNTER
+	continue
+    fi
+    
+    PACE1=`fcalc "($COUNTER-($PREVIOUS_INCIDENTS))/$PREVIOUS_INCIDENTS"`
+    PREVIOUS_INCIDENTS=$COUNTER
+    if [ ! -n "${PREVIOUS_PACE+x}" ]; then
+	PREVIOUS_PACE=$PACE1
+	continue
+    fi
+    if [ $PREVIOUS_PACE == 0 ]; then
+	PACE2="'null'"
+    else
+	PACE2=`fcalc "($PACE1-($PREVIOUS_PACE))/$PREVIOUS_PACE"`    
+    fi
+    #################################
+    
+    PREVIOUS_PACE=$PACE1
+    UUID=`python -c 'import uuid; print str(uuid.uuid5(uuid.NAMESPACE_DNS, str(uuid.getnode())))'`
+    INET_ADDR=`ifconfig | grep -A 2 eth0 | grep -o 'inet addr:[0-9]*.[0-9]*.[0-9]*.[0-9]*'`
+    INET_ADDR=${INET_ADDR#'inet addr:'}
+    DATA="data={\"clientid\":\"$UUID\",\"rate1\":$PACE1,\"rate2\":$PACE2, \"tcount\": $COUNTER,\"localip\":\"$INET_ADDR\"}"
+    wget protos.cti.gr/promis/addratio.php --post-data "$DATA" --delete-after -o /dev/null -q
+done)

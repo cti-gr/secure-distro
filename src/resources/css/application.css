@@ -1,0 +1,91 @@
+.root {
+	-fx-font-family: "Serif";
+}
+
+#aPaneEditor {
+	-fx-background-color: linear-gradient(#DACE7B, #7BBCA9);
+}
+
+#gridPaneNonSudoUsers {
+	-fx-padding: 7px, 0px, 0px, -5px;	
+}
+
+#anchorPaneBlockedSites {
+	-fx-background-color: linear-gradient(#FFF, #7BBCA9);
+}
+
+#tblBlockedWebsites .table-row-cell:empty {
+    -fx-background-color: #F0ECCA;
+}
+
+
+#lblUsername, #lblPassword1, #lblPassword2, #lblEditWebsite {
+		-fx-font-weight: bold;
+}
+
+
+#btnExit, #btnOK, #btnCancel, #btnExitUsers {
+	-fx-background-color: linear-gradient(#C7C7C7, #E3E3E3);
+	-fx-border-color: gray;
+	-fx-border-radius: 8px;
+	-fx-background-radius: 8px;
+	-fx-font-weight: bold;
+}
+
+#btnAddUser {
+	-fx-font-size: 13px;
+	-fx-background-color: linear-gradient(#FFF, #7BBCA9);
+	-fx-font-weight: bold;
+	-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 5, 0, 0, 0);
+}
+
+#btnToggleAvgd, #btnToggleDG, #btnToggleUfw, #btnToggleProtos, #btnTogglePrivoxy {
+	-fx-font-size: 13px;
+	-fx-background-color: linear-gradient(#EDEDED, #db4a4a);
+	-fx-background-image: url("../media/onoff-icon.png"); 
+	-fx-background-size: 25 25;
+	-fx-background-position: center center;
+	-fx-background-repeat: stretch;  
+	-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 5, 0, 0, 0);
+	-fx-background-radius: 7px 7px 7px 7px;
+}
+
+
+
+#btnToggleAvgd:selected, #btnToggleDG:selected, #btnToggleUfw:selected, #btnToggleProtos:selected, #btnTogglePrivoxy:selected {
+	-fx-background-color: linear-gradient(#EDEDED, #069b26);
+	-fx-background-image: url("../media/onoff-icon.png");
+	-fx-background-size: 25 25;
+	-fx-background-position: center center;
+	-fx-background-repeat: stretch;  
+}
+
+
+.menu-bar#menuBarMain {
+	-fx-border-color: gray;
+	-fx-border-width: 1px;
+}
+
+#ancPainMainUpper {
+	-fx-background-color: linear-gradient(#FFF, #DACE7B);
+}
+
+#ancPainMainLower {
+	-fx-background-color: linear-gradient(#FFF, #7BBCA9);
+}
+
+#txtAvgd, #txtDansguardian, #txtProtos, #txtUfw, #txtPrivoxy, #lblUserAdminMain, #lblMainAddUser {
+	-fx-text-alignment: center;
+}
+
+#txtUser {
+	-fx-text-alignment: left;
+}
+
+#lblUser {
+	-fx-text-alignment: right;
+}
+
+#txtCopyright {
+	-fx-text-alignment: justified;
+}
